@@ -1,0 +1,20 @@
+/*
+ * LDR_Program.c
+ *
+ *  Created on: Sep 12, 2023
+ *      Author: hp
+ */
+
+#include "../../LIB/BIT_MATH.h"
+#include "../../LIB/STD_LIB.h"
+
+#include "../../MCAL/ADC/ADC_Interface.h"
+#include "LDR_Interface.h"
+
+void HLDR_vInit(void){
+	MADC_vInit();
+}
+u16 HLDR_vCallValue(void){
+	u16 digital = MADC_u8GetDigitalValue(0);
+	return digital;
+}

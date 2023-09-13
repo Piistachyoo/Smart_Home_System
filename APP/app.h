@@ -34,6 +34,7 @@ typedef enum{
 #define MAX_LOGIN_TRIES		3
 #define TEMP_THRESHOLD		30
 #define LDR_THRESHOLD		511
+#define MAX_SIZEOFPASSWORD  4
 
 /*
  * =============================================
@@ -42,9 +43,9 @@ typedef enum{
  */
 
 void app_init(void);
-uint8 Read_Password(void);
-uint8 Get_Temperature_Value(void);
-uint16 Get_LDR_Value(void);
+u8 Read_Password(void);
+u8 Get_Temperature_Value(void);
+u16 Get_LDR_Value(void);
 void Set_Lamp_Value(enu_LampControl _val);
 void Set_Motor_Value(enu_MotorControl _val);
 void Halt_System(void);
