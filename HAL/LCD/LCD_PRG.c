@@ -125,3 +125,7 @@ void HLCD_vSendString_pos(s8 *A_s8String ,s32 A_s32RowNumber,s32 A_s32ColumnNumb
 	HLCD_vSendString(A_s8String);
 }
 
+void HLCD_vSendNumber_pos(s32 A_s32Number ,s32 A_s32RowNumber,s32 A_s32ColumnNumber){
+	HLCD_vSetCursorPosition(A_s32RowNumber, A_s32ColumnNumber);
+	HLCD_vSendNumber(A_s32Number);
+}

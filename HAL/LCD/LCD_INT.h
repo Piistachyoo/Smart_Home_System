@@ -32,5 +32,6 @@ void HLCD_vMoveTo(u8 A_u8Row, u8 A_u8Col);
 void HLCD_vSendNumber(s32 A_s32Number);
 void HLCD_vSetCursorPosition(s32 A_s32RowNumber,s32 A_s32ColumnNumber);
 void HLCD_vSendString_pos(s8 *A_s8String ,s32 A_s32RowNumber,s32 A_s32ColumnNumber);
+void HLCD_vSendNumber_pos(s32 A_s32Number ,s32 A_s32RowNumber,s32 A_s32ColumnNumber);
 
 #endif /* LCD_INT_H_ */
