@@ -120,6 +120,12 @@ void HLCD_vSetCursorPosition(s32 A_s32RowNumber,s32 A_s32ColumnNumber){
 		HLCD_vSendCommand(ROW2_Address + A_s32ColumnNumber);
 	}
 }
+
+void HLCD_vSendData_pos(u8 A_u8Data ,s32 A_s32RowNumber,s32 A_s32ColumnNumber){
+	HLCD_vSetCursorPosition(A_s32RowNumber, A_s32ColumnNumber);
+	HLCD_vSendData(A_u8Data);
+}
+
 void HLCD_vSendString_pos(s8 *A_s8String ,s32 A_s32RowNumber,s32 A_s32ColumnNumber){
 	HLCD_vSetCursorPosition(A_s32RowNumber, A_s32ColumnNumber);
 	HLCD_vSendString(A_s8String);
