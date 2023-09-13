@@ -8,23 +8,23 @@
 /*************************************************************************/
 
 #include "app.h"
-#include "../HAL/KPD/KPD_INT.h"
-#include "../HAL/LCD/LCD_INT.h"
-#include "../HAL/LM35/LM35_Interface.h"
-#include "../HAL/LDR/LDR_Interface.h"
-#include "../MCAL/ADC/ADC_Interface.h"
-#include "../MCAL/DIO/DIO_Interface.h"
-#include <util/delay.h>
 
 #define SYSTEM_PSW		1234
-
+UART_tcfgInitialize UART1;
 void SW1_Callback(void){
 	/*
 	 * Check for SW1 status,
 	 * if pressed -> turn on motor
 	 * if not pressed -> turn off motor
 	 */
-
+	if(!MDIO_U8GetPinValue(SW1_PORT, SW1_PIN)){
+		Set_Motor_Value(Motor_ON);
+		LOG("\n\r***Switch 1 pressed! Manually turning on motor!\n\r\n\r");
+	}
+	else{
+		Set_Motor_Value(Motor_OFF);
+		LOG("\n\r***Switch 1 released! Manually turning off motor!\n\r\n\r");
+	}
 }
 
 void SW2_Callback(void){
@@ -33,17 +33,37 @@ void SW2_Callback(void){
 	 * if pressed -> turn on lamp
 	 * if not pressed -> turn off lamp
 	 */
+	if(!MDIO_U8GetPinValue(SW2_PORT, SW2_PIN)){
+		Set_Lamp_Value(Lamp_ON);
+		LOG("\n\r***Switch 2 pressed! Manually turning on lamp!\n\r\n\r");
+	}
+	else{
+		Set_Lamp_Value(Lamp_OFF);
+		LOG("\n\r***Switch 2 released! Manually turning off lamp!\n\r\n\r");
+	}
 }
 
 void app_init(void){
-	/* Motor Pins Init */
+	/* Motor Pin Init */
+	MDIO_vSetPinDirection(MOTOR_PORT, MOTOR_PIN, OUTPUT);
+	MDIO_vSetPinValue(MOTOR_PORT, MOTOR_PIN, HIGH);
 
 	/* Lamp Pin Init */
+	MDIO_vSetPinDirection(LAMP_PORT, LAMP_PIN, OUTPUT);
+	MDIO_vSetPinValue(LAMP_PORT, LAMP_PIN, HIGH);
 
 	/* ADC Init */
 	MADC_vInit();
 
 	/* Switches and EXTI Init */
+	MDIO_vSetPinDirection(SW1_PORT, SW1_PIN, INPUT);
+	MDIO_vSetPinDirection(SW2_PORT, SW2_PIN, INPUT);
+	MDIO_vSetPinValue(SW1_PORT, SW1_PIN, HIGH);
+	MDIO_vSetPinValue(SW2_PORT, SW2_PIN, HIGH);
+	EXTI_cfg SW1_EXTI = {.INTx = INT0, .INTx_MODE = MODE_LOGICAL_CHANGE, .pf_Callback = SW1_Callback};
+	EXTI_cfg SW2_EXTI = {.INTx = INT1, .INTx_MODE = MODE_LOGICAL_CHANGE, .pf_Callback = SW2_Callback};
+	EXTI_vEnableEXTI(&SW1_EXTI);
+	EXTI_vEnableEXTI(&SW2_EXTI);
 
 	/* Keypad Init */
 	HKPD_Init();
@@ -52,7 +72,24 @@ void app_init(void){
 	HLCD_vInit();
 
 	/* UART Init */
-
+	UART1.GLOBAL_tcfgCharSize = CHAR_8_BITS;
+	UART1.GLOBAL_tcfgParityState = PARITY_DISABLED;
+	UART1.GLOBAL_tcfgStopBits = STOP_BITS_1;
+	UART1.GLOBAL_tcfgUartBaudRate1X = UART_BR1X_9600;
+	UART1.GLOBAL_tcfgUartClkMode = UART_ASYNCHRONOUS;
+	UART1.GLOBAL_tcfgUartCommMode = UART_1X_SPEED;
+	UART1.GLOBAL_tcfgUartInterrupt = UART_INTERRUPT_DISABLED;
+	UART_vInit(&UART1);
+	UART_vEnable(&UART1);
+	u8 cc;
+	while(1){
+		cc = UART_u8ReceiveData();
+		UART_vSendData(cc);
+		if(cc == '0'){
+			UART_vSendString((u8*)"\n\r\n\r\n\r");
+			break;
+		}
+	}
 }
 
 u8 Read_Password(void){
@@ -91,31 +128,35 @@ u8 Read_Password(void){
 
 u8 Get_Temperature_Value(void){
 	u8 ret_val = HLM35_vCallValue();
-
 	return ret_val;
 }
 
-u16 Get_LDR_Value(void){
-	u16 ret_val = HLDR_vCallValue();
-
-	return ret_val;
+u8 Get_LDR_Value(void){
+	double ret_val;
+	u16 adc_value = HLDR_vCallValue();
+	adc_value++;
+	ret_val = (adc_value / MAX_ADC_VAL) * 100; // Get percentage
+	return (u8)ret_val;
 }
 
 void Set_Lamp_Value(enu_LampControl _val){
-
+	u8 state = (_val == Lamp_OFF) ? HIGH : LOW;
+	MDIO_vSetPinValue(LAMP_PORT, LAMP_PIN, state);
 }
 
 void Set_Motor_Value(enu_MotorControl _val){
-
+	u8 state = (_val == Motor_OFF) ? HIGH : LOW;
+	MDIO_vSetPinValue(MOTOR_PORT, MOTOR_PIN, state);
 }
 
 void Halt_System(void){
 	/*
-	 * Freeze LCD and UART
-	 * De-Init all hardware except LCD
 	 * Halt system
 	 */
-	u8 str[] = "System is Halt!";
-	HLCD_vSendString(str);
+	HLCD_vDisplayClear();
+	HLCD_vSendString((u8*)"System is halted!");
+	LOG("System is halted!\n\r");
+	LOG("Reason: Invalid login attempts\n\r");
+	UART_vDisable(&UART1);
 	while(1);
 }

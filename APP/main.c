@@ -8,67 +8,101 @@
 /*************************************************************************/
 
 #include "app.h"
-#include "../HAL/LCD/LCD_INT.h"
-#include "../HAL/KPD/KPD_INT.h"
-#include "../HAL/LM35/LM35_Interface.h"
-#include "../HAL/LDR/LDR_Interface.h"
-#include <util/delay.h>
 
 int main(void){
 	u8 login_tries = 0;
 	u8 temp_value;
 	u16 ldr_value;
-	u8 str[] = "Try Again!";
-	u8 strAcsess[] = "You can Access!";
+	u8 temp_string[5];
 	app_init();
+	LOG("System is initialized!\n\r");
 	while(1){
 		if(Read_Password()){
+			LOG("Fail login attempt!\n\r");
 			login_tries++;
 			if(MAX_LOGIN_TRIES <= login_tries)
 				Halt_System();
 			else{
 				HLCD_vDisplayClear();
-				HLCD_vSendString(str);
-				_delay_ms(300);
+				HLCD_vSendString((u8*)"Try Again!");
+				_delay_ms(500);
 				HLCD_vDisplayClear();
 				continue;
 			}
 		}
 		else{
+			LOG("Successful login attempt!\n\r");
 			HLCD_vDisplayClear();
-			HLCD_vSendString(strAcsess);
-			_delay_ms(300);
+			HLCD_vSendString((u8*)"You can Access!");
+			_delay_ms(500);
 			HLCD_vDisplayClear();
 			break;
 		}
-
 	}
-
+	HLCD_vSendString((u8*)"Temp");
+	HLCD_vSendData_pos((u8)'|', STRINGS_ROW, SEPARATOR_COL);
+	HLCD_vSendString((u8*)"Light");
+	HLCD_vSendData_pos((u8)'|', VALUES_ROW, SEPARATOR_COL);
+	GIE_vEnableInterrupts();
 	while(1){
-		u8 strtemp[] = "Temperature: ";
-		u8 strldr[] =  "Sensor LDR: ";
-		u8 strspace[] = "   ";
+		LOG("------------------------------\n\r");
 		temp_value = Get_Temperature_Value();
 		ldr_value = Get_LDR_Value();
-		HLCD_vSendString(strtemp);
-		HLCD_vSendNumber(temp_value);
-		HLCD_vSendData('C');
-		HLCD_vSetCursorPosition(2, 1);
-		HLCD_vSendString(strldr);
-		HLCD_vSendNumber(ldr_value);
-		HLCD_vSendData('C');
-		_delay_ms(1000);
-		HLCD_vSendString_pos(strspace, 1, 14);
-		HLCD_vSendString_pos(strspace, 2, 13);
-		_delay_ms(1000);
-		if(TEMP_THRESHOLD < temp_value)
+		HLCD_vSendString_pos(VALUE_REMOVE_STR, VALUES_ROW, TEMP_VAL_START);
+		HLCD_vSendNumber_pos(temp_value, VALUES_ROW, TEMP_VAL_START);
+		HLCD_vSendData((u8)'C');
+		HLCD_vSendString_pos(VALUE_REMOVE_STR, VALUES_ROW, LIGHT_VAL_START);
+		HLCD_vSendNumber_pos(ldr_value, VALUES_ROW, LIGHT_VAL_START);
+		HLCD_vSendData((u8)'%');
+
+		/* Convert temperature value to printable string */
+		itoa(temp_value, (char*)temp_string, 10);
+		if(TEMP_THRESHOLD < temp_value){
+			LOG("Motor is on, temperature = ");
+			LOG(temp_string);
+			LOG("C!\n\r");
 			Set_Motor_Value(Motor_ON);
-		else
-			Set_Motor_Value(Motor_OFF);
-		if(LDR_THRESHOLD < ldr_value)
+		}
+		else{
+			/* If SW1 is not pressed */
+			if(MDIO_U8GetPinValue(SW1_PORT, SW1_PIN)){
+				LOG("Motor is off, temperature = ");
+				LOG(temp_string);
+				LOG("C!\n\r");
+				Set_Motor_Value(Motor_OFF);
+			}
+			else{
+				LOG("Cannot turn off motor, switch 1 is pressed!\n\r");
+				LOG("Current temperature = ");
+				LOG(temp_string);
+				LOG("C!\n\r");
+			}
+		}
+
+		/* Convert LDR value to printable string */
+		itoa(ldr_value, (char*)temp_string, 10);
+		if(LDR_THRESHOLD < ldr_value){
+			LOG("Lamp is on, Light intensity = ");
+			LOG(temp_string);
+			LOG("%!\n\r");
 			Set_Lamp_Value(Lamp_ON);
-		else
-			Set_Lamp_Value(Motor_OFF);
+		}
+		else{
+			/* If SW2 is not pressed */
+			if(MDIO_U8GetPinValue(SW2_PORT, SW2_PIN)){
+				LOG("Lamp is off, Light intensity = ");
+				LOG(temp_string);
+				LOG("%!\n\r");
+				Set_Lamp_Value(Lamp_OFF);
+			}
+			else{
+				LOG("Cannot turn off lamp, switch 2 is pressed!\n\r");
+				LOG("Current Light intensity = ");
+				LOG(temp_string);
+				LOG("%!\n\r");
+			}
+		}
+		_delay_ms(1000);
 	}
 	return 0;
 }

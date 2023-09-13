@@ -8,6 +8,9 @@
 #ifndef LCD_INT_H_
 #define LCD_INT_H_
 
+#include "../../LIB/BIT_MATH.h"
+#include "../../LIB/STD_LIB.h"
+
 #define CONTROL_PORT PORT_D
 #define RS 4
 #define RW 5

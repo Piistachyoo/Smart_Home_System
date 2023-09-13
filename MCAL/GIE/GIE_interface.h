@@ -12,8 +12,8 @@
 /********************* FILE INCLUDES *********************/
 #include "GIE_config.h"
 #include "GIE_private.h"
-#include "../../../Services/BIT_MATH/BIT_MATH.h"
-#include "../../../Services/STD_TYPES/STD_TYPES.h"
+#include "../../LIB/BIT_MATH.h"
+#include "../../LIB/STD_LIB.h"
 
 /********************* FUNCTION PROTOTYPES *********************/
 

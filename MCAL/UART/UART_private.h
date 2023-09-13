@@ -10,8 +10,8 @@
 #define MCAL_ATMEGA32_UART_UART_PRIVATE_H_
 
 /* Section : Includes */
-#include "../../../Services/BIT_MATH/BIT_MATH.h"
-#include "../../../Services/STD_TYPES/STD_TYPES.h"
+#include "../../LIB/BIT_MATH.h"
+#include "../../LIB/STD_LIB.h"
 
 /* Section : Macro Declarations */
 #define UDR_REG			HWREG8(0x2C)
