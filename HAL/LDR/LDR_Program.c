@@ -15,6 +15,6 @@ void HLDR_vInit(void){
 	MADC_vInit();
 }
 u16 HLDR_vCallValue(void){
-	u16 digital = MADC_u8GetDigitalValue(0);
+	u16 digital = MADC_u8GetDigitalValue(1);
 	return digital;
 }

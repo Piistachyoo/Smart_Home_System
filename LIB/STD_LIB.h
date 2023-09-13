@@ -21,6 +21,10 @@ typedef float f32;
 typedef double f64;
 typedef long double f96;
 
+#define HWREG8(_REG)		(*((volatile u8*) _REG))
+#define HWREG16(_REG)		(*((volatile u16*) _REG))
+#define HWREG32(_REG)		(*((volatile u32*) _REG))
+#define NULL		0
 
 typedef enum{
 	RET_OK = 0,
