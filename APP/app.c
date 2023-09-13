@@ -76,30 +76,15 @@ u8 Read_Password(void){
         } else if ((keypad_entry >= '0') && (keypad_entry <= '9')) {
             HLCD_vSendData(keypad_entry);
             _delay_ms(50);
-            password = (password * 10) + (keypad_entry - '0');
-        } else {
-            // Handle invalid characters (e.g., display an error message)
-        	//HLCD_vSendString(strinvalid);
-        }
+            password += (keypad_entry - 48);
+            password *= 10;
+        } else { /* Do Nothing */ }
     }
 
     password /= 10;
 
     // Check if the entered password is correct
-    u8 ret_val = (password == SYSTEM_PSW) ? 1 : 0;
-    u8 strEntr[] = "Entered: ";
-    u8 strExp[]  = "Expected: ";
-    HLCD_vDisplayClear();
-    HLCD_vSetCursorPosition(1, 1); // Adjust the cursor position
-    HLCD_vSendString(strEntr);
-    HLCD_vSendNumber(password);
-    _delay_ms(500);
-    HLCD_vDisplayClear();
-    HLCD_vSetCursorPosition(1, 1); // Adjust the cursor position
-    HLCD_vSendString(strExp);
-    HLCD_vSendNumber(SYSTEM_PSW);
-    _delay_ms(500);
-    HLCD_vDisplayClear();
+    u8 ret_val = (password == SYSTEM_PSW) ? 0 : 1;
     return ret_val;
 
 }
