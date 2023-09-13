@@ -81,7 +81,7 @@ int main(void){
 
 		/* Convert LDR value to printable string */
 		itoa(ldr_value, (char*)temp_string, 10);
-		if(LDR_THRESHOLD < ldr_value){
+		if(LDR_THRESHOLD > ldr_value){
 			LOG("Lamp is on, Light intensity = ");
 			LOG(temp_string);
 			LOG("%!\n\r");
