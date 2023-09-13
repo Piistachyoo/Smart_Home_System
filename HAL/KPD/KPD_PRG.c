@@ -40,12 +40,12 @@ u8 HKPD_U8GetPressedKey(void){
                 _delay_ms(10); // Debounce delay (adjust as needed)
                 // Check again to confirm the key press
                 if (MDIO_U8GetPinValue(KPD_PORT, col) == 0) {
+                    // Wait for key release
+                    while (MDIO_U8GetPinValue(KPD_PORT, col) == 0);
                     // Key press confirmed
                     local_u8Key = keys[row][col - 4];
                     // Release the row (set it back to HIGH)
                     MDIO_vSetPinValue(KPD_PORT, row, HIGH);
-                    // Wait for key release
-                    while (MDIO_U8GetPinValue(KPD_PORT, col) == 0);
                     // Return the detected key
                     return local_u8Key;
                 }

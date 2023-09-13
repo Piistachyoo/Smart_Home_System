@@ -5,9 +5,7 @@
  *      Author: hp
  */
 
-/* library includes */
-#include "../../LIB/BIT_MATH.h"
-#include "../../LIB/STD_LIB.h"
+
 /* include for every header file (DIO) */
 #include "DIO_Interface.h"
 #include "DIO_Private.h"
@@ -119,19 +117,19 @@ void MDIO_vTogglePinValue(u8 A_u8portNumber, u8 A_u8pinNumber)
 	switch(A_u8portNumber){
 	case PORT_A:
 		//PORTA ^= (1<<A_u8pinNumber);
-		TOGGLE_BIT(PORTA,A_u8pinNumber);
+		TOG_BIT(PORTA,A_u8pinNumber);
 		break;
 	case PORT_B:
 		//PORTB ^= (1<<A_u8pinNumber);
-		TOGGLE_BIT(PORTB,A_u8pinNumber);
+		TOG_BIT(PORTB,A_u8pinNumber);
 		break;
 	case PORT_C:
 		//PORTC ^= (1<<A_u8pinNumber);
-		TOGGLE_BIT(PORTC,A_u8pinNumber);
+		TOG_BIT(PORTC,A_u8pinNumber);
 		break;
 	case PORT_D:
 		//PORTD ^= (1<<A_u8pinNumber);
-		TOGGLE_BIT(PORTD,A_u8pinNumber);
+		TOG_BIT(PORTD,A_u8pinNumber);
 		break;
 	}
 }

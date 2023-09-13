@@ -8,6 +8,10 @@
 #ifndef DIO_INTERFACE_H_
 #define DIO_INTERFACE_H_
 
+/* library includes */
+#include "../../LIB/BIT_MATH.h"
+#include "../../LIB/STD_LIB.h"
+
 #define INPUT 0
 #define OUTPUT 1
 

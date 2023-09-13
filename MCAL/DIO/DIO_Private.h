@@ -8,6 +8,7 @@
 #ifndef DIO_PRIVATE_H_
 #define DIO_PRIVATE_H_
 
+
 /* Direction registers */
 #define DDRA *((volatile u8 *)0x3A)
 #define DDRB  *((volatile u8 *)0x37)
